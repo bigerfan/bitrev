@@ -1,0 +1,29 @@
+body{
+  background-color: #e5e7eb;
+  overflow-x: auto;
+}
+
+h1{
+  font-size: xx-large;
+}
+
+h2{
+  font-size: x-large;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.4); 
+  border-radius: 9999px;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.6);
+}
