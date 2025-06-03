@@ -22,11 +22,10 @@ export function NextStep(setStep: React.Dispatch<React.SetStateAction<number>>) 
         onComplete: () => setStep(prev => prev + 1)
     });
 
-    gsap.to('.formContext',{
-        height:0,
-        padding:0,
+    gsap.to('.formContext', {
+        height: 0,
+        padding: 0,
         duration: 1
     })
-
 
 }

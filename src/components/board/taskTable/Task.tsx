@@ -9,6 +9,8 @@ import { MdDeleteOutline } from "react-icons/md";
 import { GrStatusInfo } from "react-icons/gr";
 import type { ColumnType, TasksType } from "@/lib/types";
 import { useBoardStore } from "@/store/boardStore";
+import gsap from "gsap";
+import { useRef } from "react";
 
 type TaskProp = {
   task: TasksType;
@@ -16,12 +18,16 @@ type TaskProp = {
 };
 
 export const Task = ({ task, col }: TaskProp) => {
+  const taskref = useRef(null);
   const deleteTask = useBoardStore((state) => state.deleteTask);
   const openDialog = useBoardStore((state) => state.setOpenDialog);
 
-
   return (
-    <Card key={task.id} className="w-auto">
+    <Card
+      key={task.id}
+      ref={taskref}
+      className="w-auto task my-4 overflow-hidden"
+    >
       <CardContent className="break-words whitespace-normal ">
         {task.name}
       </CardContent>
@@ -30,17 +36,36 @@ export const Task = ({ task, col }: TaskProp) => {
           <Button
             variant={"secondary"}
             className=""
-            onClick={() => openDialog({value :col.id , taskId : task.id, EditedContent: task.name})}>
+            onClick={() =>
+              openDialog({
+                value: col.id,
+                taskId: task.id,
+                EditedContent: task.name,
+              })
+            }
+          >
             <FaRegEdit />
           </Button>
           <Button
             variant={"destructive"}
-            onClick={() => deleteTask(col.id, task.id)}
-            className="">
+            onClick={() =>{
+              gsap.to(taskref.current, {
+                stagger: undefined,
+                height: 0,
+                margin: 0,
+                padding: 0,
+                opacity: 0,
+                duration: 0.2,
+                onComplete:()=> deleteTask(col.id,task.id)
+              })
+            }
+            }
+            className=""
+          >
             <MdDeleteOutline />
           </Button>
           <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild>
               <Button>
                 <GrStatusInfo />
               </Button>

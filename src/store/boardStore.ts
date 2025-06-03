@@ -2,29 +2,28 @@ import type { ColumnType } from '@/lib/types';
 import { create } from 'zustand'
 
 type BoardState = {
-    columns: ColumnType[];
-    openDialog: {value : number , taskId? : number , EditedContent? : string},
-    setOpenDialog: (newOd :{value : number , taskId ?: number , EditedContent? : string}) => void
-    addTask: (columnId: number, taskName: string) => void;
-    removeTask: (columnId: number, taskId: number) => void;
-    editTask: (columnId: number, taskId: number, editContent: string) => void
-    deleteTask: (columnId: number, taskId: number) => void;
-    addColumn: (columnName: string) => void;
+    columns: ColumnType[],
+    openDialog: { value: number, taskId?: number, EditedContent?: string },
+    setOpenDialog: (newOd: { value: number, taskId?: number, EditedContent?: string }) => void,
+    addTask: (columnId: number, taskName: string) => void,
+    removeTask: (columnId: number, taskId: number) => void,
+    editTask: (columnId: number, taskId: number, editContent: string) => void,
+    deleteTask: (columnId: number, taskId: number) => void,
+    addColumn: (columnName: string ,added?: boolean) => void,
+    createCol: (column : ColumnType , index: number) => void,
+    deleteColumn: (columnId: number) => void,
+    changeColumnName : (columnId : number, columnTitle : string) => void,
+
 };
 
 
 
 export const useBoardStore = create<BoardState>((set) => ({
-    openDialog: {value : 0},
+    openDialog: { value: 0 },
     setOpenDialog: (newOd) => set(state => ({
-        openDialog: {...newOd}
+        openDialog: { ...newOd }
     }),
     ),
-
-
-
-
-
 
     columns: [
         {
@@ -50,6 +49,7 @@ export const useBoardStore = create<BoardState>((set) => ({
             ],
         },
     ],
+    
     addTask: (columnId, taskname) =>
         set(state => ({
             columns:
@@ -68,10 +68,23 @@ export const useBoardStore = create<BoardState>((set) => ({
         set(state => ({
             columns: state.columns.map(col => col.id == columnId ? { ...col, tasks: col.tasks.filter(task => task.id !== taskId) } : col)
         })),
-    addColumn: (columnName) =>
+    addColumn: (columnName,added) =>
         set(state => ({
-            columns: [...state.columns, { id: Date.now(), title: columnName, tasks: [] }]
+            columns: [...state.columns, { id: Date.now(), title: columnName, tasks: [],added: added }]
         })),
+    deleteColumn: (columnId) => set(state => ({
+        columns: state.columns.filter(col => col.id !== columnId)
+    })),
+    createCol:(column ,index)=>set((state)=> {
+        const newCols = [...state.columns]
+        newCols.splice(index , 0 ,column)
+        return {columns : newCols}
+        
+        }),
+
+    changeColumnName:(columnId , newTitle)=>set(state=>({
+        columns : state.columns.map(col=> col.id == columnId ? {...col , title: newTitle} : col)
+    })) ,
 
 
 }))
