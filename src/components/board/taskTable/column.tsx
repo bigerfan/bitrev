@@ -11,69 +11,60 @@ import { Task } from "./Task";
 import type { ColumnType } from "@/lib/types";
 import { toast } from "sonner";
 import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
+import { stateIn, stateOut } from "@/lib/animation";
 import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
 type ColProp = {
   column: ColumnType;
 };
 
 export const Column = ({ column }: ColProp) => {
-  const index = useBoardStore
-    .getState()
-    .columns.findIndex((col) => col.id == column.id);
-  const Od = useBoardStore((state) => state.openDialog);
-  const openDialog = useBoardStore((state) => state.setOpenDialog);
-  const deleteCol = useBoardStore((state) => state.deleteColumn);
-  const undoCol = useBoardStore((state) => state.createCol);
-  const changeColName = useBoardStore((state) => state.changeColumnName);
+
+  gsap.registerPlugin(useGSAP);
+
+  const {
+    undoDeletePendingCol,
+    setdeletePendingCol,
+    columns,
+    deleteColumn: deleteCol,
+    setOpenDialog: openDialog,
+    openDialog: Od,
+    changeColumnName: changeColName,
+  } = useBoardStore();
 
   const [changeTitle, setChangeTitle] = useState<boolean>(false);
   const titleInput = useRef<HTMLInputElement>(null);
+  const colRef = useRef<HTMLDivElement>(null);
 
-  const colSelector = `#col${column.id}`;
-
-  gsap.registerPlugin(useGSAP)
+  useGSAP(() => {
+    if (colRef.current)
+      gsap.fromTo(colRef.current, { opacity: 0 }, { opacity: 1, delay: 0.4 });
+  });
 
   function handleDeleteCol() {
-    gsap.to(`${colSelector} .task`, {
-      opacity: 0,
-      y: 20,
-      stagger: 0.05,
-      duration: 0.3,
-      ease: "power1.inOut",
-    });
-    setTimeout(
-      () =>
-        gsap.to(colSelector, {
-          opacity: 0,
-          scale: 0.95,
-          height: 0,
-          marginBottom: 0,
-          duration: 0.4,
-          ease: "power2.inOut",
-          onComplete: () => {
-            deleteCol(column.id);
-            toast("Column has Been deleted", {
-              action: {
-                label: "Undo",
-                onClick: () => undoCol(column, index),
-              },
-            });
+    if (colRef.current) {
+      setdeletePendingCol(column.id);
+      stateOut(".column", colRef.current);
+
+      toast.success("Column has Been deleted", {
+        action: {
+          label: "Undo",
+          onClick: () => {
+            undoDeletePendingCol(column.id);
+            stateIn(".column", colRef.current);
           },
-        }),
-      300
-    );
+        },
+        onAutoClose: () => {
+          const isStillPending = useBoardStore
+            .getState()
+            .deletePendingCols.includes(column.id);
+          if (isStillPending) deleteCol(column.id);
+          console.log(columns);
+        },
+      });
+    }
   }
-
-  useGSAP(()=>(column.added?
-    gsap.from(colSelector,{
-      width:0,
-      opacity:0,
-      duration:.3
-    }):false
-  ))
-
 
   useEffect(() => {
     setTimeout(() => titleInput.current?.focus(), 300);
@@ -81,8 +72,9 @@ export const Column = ({ column }: ColProp) => {
 
   return (
     <div
+      ref={colRef}
       key={column.id}
-      className={`w-[22rem] bg-gray-300 px-4 h-fit rounded-md max-h-fit column`}
+      className={`w-[22rem] bg-gray-300 rounded-md max-h-fit column px-4`}
       id={`col${column.id}`}
     >
       <div className="h-fit py-3 px-3 mx-5 overflow-hidden flex flex-row justify-between border-b-2 border-gray-500 group gap-2 min-w-60 ">
@@ -128,7 +120,7 @@ export const Column = ({ column }: ColProp) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div>
+      <div className=" task bg-transparent  rounded-b-md py-3" >
         {column.tasks.map((task) => (
           <Task task={task} col={column} key={task.id} />
         ))}

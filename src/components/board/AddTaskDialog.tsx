@@ -9,6 +9,7 @@ import {
 } from "../ui/dialog";
 import { useBoardStore } from "@/store/boardStore";
 import { Textarea } from "../ui/textarea";
+import { stateIn } from "@/lib/animation";
 
 export const AddTaskDialog = () => {
   const openDialog = useBoardStore((state) => state.setOpenDialog);
@@ -24,7 +25,7 @@ export const AddTaskDialog = () => {
 
   function handleAddTask() {
     if (Od.taskId && Od.EditedContent) editTask(Od.value, Od.taskId, input);
-    else addTask(Od.value, input);
+    else stateIn('.task',`task-${Od.value}-${Od.taskId}`,()=>addTask(Od.value,input))
 
     setInput("");
     openDialog({ value: 0 });

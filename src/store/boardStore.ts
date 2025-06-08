@@ -3,16 +3,19 @@ import { create } from 'zustand'
 
 type BoardState = {
     columns: ColumnType[],
+    deletePendingCols: number[],
     openDialog: { value: number, taskId?: number, EditedContent?: string },
+    setdeletePendingCol: (colId: number) => void,
+    undoDeletePendingCol: (colId: number) => void,
     setOpenDialog: (newOd: { value: number, taskId?: number, EditedContent?: string }) => void,
     addTask: (columnId: number, taskName: string) => void,
     removeTask: (columnId: number, taskId: number) => void,
     editTask: (columnId: number, taskId: number, editContent: string) => void,
     deleteTask: (columnId: number, taskId: number) => void,
-    addColumn: (columnName: string ,added?: boolean) => void,
-    createCol: (column : ColumnType , index: number) => void,
+    addColumn: (columnName: string, added?: boolean) => void,
+    createCol: (column: ColumnType, index: number) => void,
     deleteColumn: (columnId: number) => void,
-    changeColumnName : (columnId : number, columnTitle : string) => void,
+    changeColumnName: (columnId: number, columnTitle: string) => void,
 
 };
 
@@ -24,7 +27,13 @@ export const useBoardStore = create<BoardState>((set) => ({
         openDialog: { ...newOd }
     }),
     ),
-
+    deletePendingCols: [],
+    setdeletePendingCol: (colId) => set(state => ({
+        deletePendingCols: [...state.deletePendingCols, colId]
+    })),
+    undoDeletePendingCol: (colId) => set(state => ({
+        deletePendingCols: state.deletePendingCols.filter(col => col !== colId)
+    })),
     columns: [
         {
             id: 1,
@@ -49,7 +58,7 @@ export const useBoardStore = create<BoardState>((set) => ({
             ],
         },
     ],
-    
+
     addTask: (columnId, taskname) =>
         set(state => ({
             columns:
@@ -68,23 +77,27 @@ export const useBoardStore = create<BoardState>((set) => ({
         set(state => ({
             columns: state.columns.map(col => col.id == columnId ? { ...col, tasks: col.tasks.filter(task => task.id !== taskId) } : col)
         })),
-    addColumn: (columnName,added) =>
+    addColumn: (columnName, added) => {
+        const colId = Date.now()
+
         set(state => ({
-            columns: [...state.columns, { id: Date.now(), title: columnName, tasks: [],added: added }]
-        })),
+            columns: [...state.columns, { id: colId, title: columnName, tasks: [], added: added }]
+        }))
+
+    },
     deleteColumn: (columnId) => set(state => ({
         columns: state.columns.filter(col => col.id !== columnId)
     })),
-    createCol:(column ,index)=>set((state)=> {
+    createCol: (column, index) => set((state) => {
         const newCols = [...state.columns]
-        newCols.splice(index , 0 ,column)
-        return {columns : newCols}
-        
-        }),
+        newCols.splice(index, 0, column)
+        return { columns: newCols }
 
-    changeColumnName:(columnId , newTitle)=>set(state=>({
-        columns : state.columns.map(col=> col.id == columnId ? {...col , title: newTitle} : col)
-    })) ,
+    }),
+
+    changeColumnName: (columnId, newTitle) => set(state => ({
+        columns: state.columns.map(col => col.id == columnId ? { ...col, title: newTitle } : col)
+    })),
 
 
 }))

@@ -11,6 +11,8 @@ import type { ColumnType, TasksType } from "@/lib/types";
 import { useBoardStore } from "@/store/boardStore";
 import gsap from "gsap";
 import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import { stateOut } from "@/lib/animation";
 
 type TaskProp = {
   task: TasksType;
@@ -22,9 +24,14 @@ export const Task = ({ task, col }: TaskProp) => {
   const deleteTask = useBoardStore((state) => state.deleteTask);
   const openDialog = useBoardStore((state) => state.setOpenDialog);
 
+  useGSAP(() => {
+    if (taskref.current)
+      gsap.fromTo(taskref.current, { opacity: 0 }, { opacity: 1, delay: 0.4 });
+  });
   return (
     <Card
       key={task.id}
+      id={`task-${col.id}-${task.id}`}
       ref={taskref}
       className="w-auto task my-4 overflow-hidden"
     >
@@ -48,18 +55,10 @@ export const Task = ({ task, col }: TaskProp) => {
           </Button>
           <Button
             variant={"destructive"}
-            onClick={() =>{
-              gsap.to(taskref.current, {
-                stagger: undefined,
-                height: 0,
-                margin: 0,
-                padding: 0,
-                opacity: 0,
-                duration: 0.2,
-                onComplete:()=> deleteTask(col.id,task.id)
-              })
-            }
-            }
+            onClick={() => {
+              if (taskref.current)
+                stateOut(".task", taskref.current,()=> deleteTask(col.id, task.id));
+            }}
             className=""
           >
             <MdDeleteOutline />
