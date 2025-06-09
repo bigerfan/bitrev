@@ -1,7 +1,6 @@
 export type ColumnType = {
     id: number,
     title: string,
-    added?:boolean,
     tasks: TasksType[]
 }
 

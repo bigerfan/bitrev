@@ -17,15 +17,16 @@ export const AddTaskDialog = () => {
   const addTask = useBoardStore((state) => state.addTask);
   const editTask = useBoardStore((state) => state.editTask);
 
-  const [input, setInput] = useState<string>( "");
+  const [input, setInput] = useState<string>("");
 
-  useEffect(()=> setInput(Od.EditedContent || '') , [Od.EditedContent])
-
-
+  useEffect(() => setInput(Od.EditedContent || ""), [Od.EditedContent]);
 
   function handleAddTask() {
     if (Od.taskId && Od.EditedContent) editTask(Od.value, Od.taskId, input);
-    else stateIn('.task',`task-${Od.value}-${Od.taskId}`,()=>addTask(Od.value,input))
+    else {
+      stateIn(".task", `task-${Od.value}-${Od.taskId}`),
+        () => addTask(Od.value, input);
+    }
 
     setInput("");
     openDialog({ value: 0 });

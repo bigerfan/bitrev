@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { stateIn, stateOut } from "@/lib/animation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { Draggable } from "gsap/Draggable";
 
 type ColProp = {
   column: ColumnType;
@@ -40,6 +41,9 @@ export const Column = ({ column }: ColProp) => {
   useGSAP(() => {
     if (colRef.current)
       gsap.fromTo(colRef.current, { opacity: 0 }, { opacity: 1, delay: 0.4 });
+
+
+      
   });
 
   function handleDeleteCol() {
@@ -74,8 +78,11 @@ export const Column = ({ column }: ColProp) => {
     <div
       ref={colRef}
       key={column.id}
-      className={`w-[22rem] bg-gray-300 rounded-md max-h-fit column px-4`}
+      className={`w-[22rem] bg-gray-300 rounded-md max-h-fit column drag-zone px-4`}
       id={`col${column.id}`}
+      column-id={column.id}
+      onDrop={()=>alert(column.id)}
+      onDragOver={(e)=>e.preventDefault()}
     >
       <div className="h-fit py-3 px-3 mx-5 overflow-hidden flex flex-row justify-between border-b-2 border-gray-500 group gap-2 min-w-60 ">
         {changeTitle ? (

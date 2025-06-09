@@ -9,9 +9,9 @@ type BoardState = {
     undoDeletePendingCol: (colId: number) => void,
     setOpenDialog: (newOd: { value: number, taskId?: number, EditedContent?: string }) => void,
     addTask: (columnId: number, taskName: string) => void,
-    removeTask: (columnId: number, taskId: number) => void,
     editTask: (columnId: number, taskId: number, editContent: string) => void,
     deleteTask: (columnId: number, taskId: number) => void,
+    moveTask: (toColumn: number, taskId: number) => void,
     addColumn: (columnName: string, added?: boolean) => void,
     createCol: (column: ColumnType, index: number) => void,
     deleteColumn: (columnId: number) => void,
@@ -64,11 +64,6 @@ export const useBoardStore = create<BoardState>((set) => ({
             columns:
                 state.columns.map((col) => col.id == columnId ? { ...col, tasks: [...col.tasks, { name: taskname, id: Date.now() }] } : col)
         })),
-    removeTask: (columnId, taskId) =>
-        set(state => ({
-            columns:
-                state.columns.map((col) => col.id == columnId ? { ...col, tasks: col.tasks.filter(task => task.id !== taskId) } : col)
-        })),
     editTask: (columnId, taskId, editContent) =>
         set(state => ({
             columns: state.columns.map(col => col.id == columnId ? { ...col, tasks: col.tasks.map(task => task.id == taskId ? { ...task, name: editContent } : task) } : col)
@@ -77,6 +72,25 @@ export const useBoardStore = create<BoardState>((set) => ({
         set(state => ({
             columns: state.columns.map(col => col.id == columnId ? { ...col, tasks: col.tasks.filter(task => task.id !== taskId) } : col)
         })),
+    moveTask: (toColumn, taskId) =>
+        set(state => {
+            const fromCol = state.columns.find(col => col.tasks.find(task => task.id == taskId))
+            const task = fromCol?.tasks.find(task => task.id == taskId)
+
+            if (!task || !fromCol) return { columns: state.columns }
+
+            const newCols = state.columns.map(col => {
+                if (col.id == toColumn)
+                    col = { ...col, tasks: [...col.tasks, task] }
+                else if (col.id == fromCol.id) {
+                    col = { ...col, tasks: col.tasks.filter(t => t.id !== task.id) }
+                }
+                return col
+            })
+            return { columns: newCols }
+
+        })
+    ,
     addColumn: (columnName, added) => {
         const colId = Date.now()
 
