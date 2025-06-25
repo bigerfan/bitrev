@@ -13,7 +13,7 @@ export const StepTwo = ({ setStep }: TProp) => {
     <div className="flex flex-col gap-4">
       <Input placeholder="Board Name"  />
       <Textarea placeholder="Board Info" />
-      <Button onClick={() => NextStep(setStep)}>Next Step</Button>
+      <Button onClick={() => NextStep(()=>setStep(prev => prev +=1))}>Next Step</Button>
     </div>
   );
 };

@@ -9,7 +9,7 @@ type OneProp = {
 export const StepOne = ({ setStep }: OneProp) => {
   return (
     <div>
-      <Button onClick={() => NextStep(setStep)}>Create Board</Button>
+      <Button onClick={() => NextStep(()=>setStep(prev => prev +=1))}>Create Board</Button>
     </div>
   );
 };

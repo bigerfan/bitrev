@@ -28,15 +28,15 @@ export const MainForm = () => {
   );
 
   return (
-    <div className=" rounded-xl bg-[#DCD7C9] shadow-2xl px-4 py-7 ">
+    <div className=" rounded-xl bg-[#C4AE78] shadow-2xl px-4 py-7 ">
       <FormTitle step={step} />
-      <div className=" border-t-2 border-b-2 border-gray-200 my-4 formContext overflow-hidden opacity-100">
+      <div className=" border-t-2 border-b-2 border-gray-100 my-4 formContext overflow-hidden opacity-100">
         <div className="px-4 py-7">
           {step == 0 && <StepOne setStep={setStep} />}
           {step == 1 && <StepTwo setStep={setStep} />}
           {step == 2 && <StepThree setStep={setStep} />}
           {step == 3 && (
-            <StepFour  />
+            <StepFour setStep={setStep} />
           )}
         </div>
       </div>

@@ -16,13 +16,16 @@ export const StepThree = ({ setStep }: TProp) => {
     <div className="flex flex-col gap-4">
       <div>
         <h1 className="mx-2 my-4">Main Color</h1>
-        <ColorPicker value={color} onChange={(v)=>setColor(v)} />
+        <ColorPicker value={color} onChange={(v) => setColor(v)} />
       </div>
       <div>
         <h2 className="mx-2 my-4">Sub Color</h2>
-        <ColorPicker value={Seccolor} onChange={(v)=>SecsetColor(v)} />
+        <ColorPicker value={Seccolor} onChange={(v) => SecsetColor(v)} />
       </div>
-      <Button onClick={() => NextStep(setStep)}>Next Step</Button>
+      <Button onClick={() => NextStep(() => setStep((prev) => (prev +=1)))}>
+        Next Step
+      </Button>
+      <Button variant={'outline'} onClick={() => NextStep(() => setStep((prev) => (prev -=1)))}>Prev Step</Button>
     </div>
   );
 };

@@ -22,9 +22,7 @@ type TaskProp = {
 };
 
 export const Task = ({ task, col }: TaskProp) => {
-  gsap.registerPlugin(useGSAP);
-  gsap.registerPlugin(Draggable);
-  gsap.registerPlugin(Flip);
+
 
   const taskref = useRef(null);
   const deleteTask = useBoardStore((state) => state.deleteTask);
@@ -35,24 +33,56 @@ export const Task = ({ task, col }: TaskProp) => {
     if (taskref.current)
       gsap.fromTo(taskref.current, { opacity: 0 }, { opacity: 1, delay: 0.4 });
 
-    const state = Flip.getState(`.task`);
-
-    const test = Draggable.create(taskref.current, {
+    const draggable = Draggable.create(taskref.current, {
       edgeResistance: 0.8,
-      onDragStart: (e) => console.log(e),
+      onDragStart: function () {
+        this.target.classList.remove("task");
+        gsap.to(".task", {
+          opacity: 0.1,
+        });
+        gsap.to(taskref.current, {
+          scale: 1.1,
+          boxShadow: "0px 10px 25px rgba(0,0,0,0.2)",
+          zIndex: 9999,
+          opacity:1,
+          duration: 0.2,
+        });
+      },
+      onDrag: function () {
+        const zones = document.querySelectorAll(".drag-zone");
+
+        zones.forEach((zone) => {
+          const rect = zone.getBoundingClientRect();
+          const isOver =
+            this.pointerX > rect.left &&
+            this.pointerX < rect.right &&
+            this.pointerY > rect.top &&
+            this.pointerY < rect.bottom;
+
+          if (isOver) {
+            zone.classList.add("highlight-zone");
+          } else {
+            zone.classList.remove("highlight-zone");
+          }
+        });
+      },
       zIndexBoost: true,
-      onPress: function () {
+      onPress: function (e) {
         this.lastX = this.x;
         this.lastY = this.y;
       },
+      onDragEnd: () => {
+        setTimeout(() => gsap.to(".task", { opacity: 1, stagger: 0.1,zIndex: 1 }), 300);
+      },
       onRelease: function () {
-        const Columns = document.querySelectorAll(
-          ".drag-zone"
-        ) as NodeListOf<HTMLDivElement>;
+        const zones = document.querySelectorAll(".drag-zone");
+
         let isIn = false;
-        for (const zone of Columns) {
+        for (const zone of zones) {
           const rect = zone.getBoundingClientRect();
-          const colId = zone.attributes.getNamedItem("column-id")?.nodeValue;
+          const targetId = zone.id;
+
+          this.target.classList.add("task");
 
           isIn =
             this.pointerX > rect.left &&
@@ -60,35 +90,46 @@ export const Task = ({ task, col }: TaskProp) => {
             this.pointerY > rect.top &&
             this.pointerY < rect.bottom;
 
-          if (isIn && colId) {
-            moveTask(parseInt(colId), task.id);
+          if (isIn) zone.classList.remove("highlight-zone");
+
+          if (isIn && targetId && targetId !== col.id) {
+            zone.classList.remove("highlight-zone");
+            const state = Flip.getState(`.task-${col.id}, .task-${targetId} `);
+
+            moveTask(targetId, task.id);
+            requestAnimationFrame(() => {
+              Flip.from(state, {
+                duration: 0.7,
+                ease: "power2.inOut",
+              });
+            });
             break;
+          } else if (!isIn) {
+            gsap.to(this.target, {
+              x: this.startX,
+              y: this.startY,
+              duration: 0.3,
+              ease: "power4.inOut",
+            });
           }
         }
+        gsap.to(taskref.current, { opacity: 1, scale: 1, boxShadow: "none" });
       },
       type: "x,y",
-      onDragEnd: () => {
-        Flip.from(state, {
-          duration: 0.7,
-          ease: "power2.inOut",
-          stagger: 0.2,
-          onEnter: () => {
-            alert("tetas");
-          },
-        });
-      },
     });
 
     return () => {
-      test[0]?.kill();
+      draggable[0].kill();
     };
-  }, [col.id, task.id]);
+  }, []);
+
   return (
     <Card
       key={task.id}
-      id={`task-${col.id}-${task.id}`}
+      id={task.id}
       ref={taskref}
-      className={`w-auto task-${col.id} task my-4 overflow-hidden`}
+      className={`w-auto task-${col.id} task draggable-Task my-4 overflow-hidden bg-muted`}
+      parent-col={col.id}
     >
       <CardContent className="break-words whitespace-normal ">
         {task.name}

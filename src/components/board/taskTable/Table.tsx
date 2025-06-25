@@ -5,7 +5,6 @@ import gsap from "gsap";
 
 export const Table = () => {
   const columns = useBoardStore((state) => state.columns);
-  gsap.registerPlugin(useGSAP);
 
   useGSAP(() => {
     gsap.from(".popop", {

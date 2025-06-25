@@ -9,7 +9,7 @@ import {
 } from "../ui/dialog";
 import { useBoardStore } from "@/store/boardStore";
 import { Textarea } from "../ui/textarea";
-import { stateIn } from "@/lib/animation";
+import { Flip } from "gsap/Flip";
 
 export const AddTaskDialog = () => {
   const openDialog = useBoardStore((state) => state.setOpenDialog);
@@ -22,20 +22,29 @@ export const AddTaskDialog = () => {
   useEffect(() => setInput(Od.EditedContent || ""), [Od.EditedContent]);
 
   function handleAddTask() {
+    const state = Flip.getState(`.task-${Od.value}`);
+
     if (Od.taskId && Od.EditedContent) editTask(Od.value, Od.taskId, input);
     else {
-      stateIn(".task", `task-${Od.value}-${Od.taskId}`),
-        () => addTask(Od.value, input);
+      addTask(Od.value, input);
+
+      requestAnimationFrame(() =>
+        Flip.from(state, {
+          duration: 0.8,
+          ease: "power2.inOut",
+          stagger: 0.2,
+        })
+      );
     }
 
     setInput("");
-    openDialog({ value: 0 });
+    openDialog({ value: "" });
   }
 
   return (
     <Dialog
-      open={Od.value !== 0}
-      onOpenChange={(open) => !open && openDialog({ value: 0 })}
+      open={Od.value.trim() !== ""}
+      onOpenChange={(open) => !open && openDialog({ value: "" })}
     >
       <div>
         <div>

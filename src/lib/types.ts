@@ -1,10 +1,10 @@
 export type ColumnType = {
-    id: number,
+    id: string,
     title: string,
     tasks: TasksType[]
 }
 
 export type TasksType = {
-    id: number,
+    id: string,
     name: string,
 }

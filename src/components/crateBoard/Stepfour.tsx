@@ -1,10 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NextStep } from "@/lib/animation";
+import { useBoardStore } from "@/store/boardStore";
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
 
+type props = {
+  setStep: React.Dispatch<React.SetStateAction<number>>;
+};
 
-export const StepFour = () => {
+export const StepFour = ({ setStep }: props) => {
+  const addColumn = useBoardStore((state) => state.addColumn);
   const [tasks, setTasks] = useState([{ id: 1, title: "" }]);
   const inputRef = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -18,6 +24,7 @@ export const StepFour = () => {
     const lastTask = tasks[tasks.length - 1];
     if (!lastTask.title.trim()) return;
     setTasks([...tasks, { id: Date.now(), title: "" }]);
+    console.log(tasks);
   };
 
   const handleRemove = (id: number, index: number) => {
@@ -69,8 +76,19 @@ export const StepFour = () => {
       </div>
 
       <div>
-        <Button variant="secondary">Back</Button>
-        <Button className="mx-4">Next Step</Button>
+        <Button onClick={() => tasks.map((task) => addColumn(task.title))}>
+          Next Step
+        </Button>
+        <Button
+          variant={"outline"}
+          onClick={() =>
+            NextStep(() => {
+              setStep((prev) => (prev -= 1));
+            })
+          }
+        >
+          Prev Step
+        </Button>
       </div>
     </div>
   );

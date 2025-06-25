@@ -2,10 +2,8 @@ import gsap from "gsap";
 import { SplitText } from "gsap/all";
 import { Flip } from "gsap/Flip";
 
-gsap.registerPlugin(SplitText)
-gsap.registerPlugin(Flip)
 
-export function NextStep(setStep: React.Dispatch<React.SetStateAction<number>>) {
+export function NextStep(onComplete : ()=>void) {
     const split = SplitText.create(".myText", { type: "words,chars" });
     const anotherSplit = SplitText.create(".myText2", { type: "words" });
 
@@ -21,7 +19,7 @@ export function NextStep(setStep: React.Dispatch<React.SetStateAction<number>>) 
         y: -100,
         autoAlpha: 0,
         stagger: 0.1,
-        onComplete: () => setStep(prev => prev + 1)
+        onComplete: onComplete
     });
 
     gsap.to('.formContext', {

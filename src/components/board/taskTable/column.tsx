@@ -14,16 +14,12 @@ import { useEffect, useRef, useState } from "react";
 import { stateIn, stateOut } from "@/lib/animation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { Draggable } from "gsap/Draggable";
 
 type ColProp = {
   column: ColumnType;
 };
 
 export const Column = ({ column }: ColProp) => {
-
-  gsap.registerPlugin(useGSAP);
-
   const {
     undoDeletePendingCol,
     setdeletePendingCol,
@@ -41,9 +37,6 @@ export const Column = ({ column }: ColProp) => {
   useGSAP(() => {
     if (colRef.current)
       gsap.fromTo(colRef.current, { opacity: 0 }, { opacity: 1, delay: 0.4 });
-
-
-      
   });
 
   function handleDeleteCol() {
@@ -78,29 +71,34 @@ export const Column = ({ column }: ColProp) => {
     <div
       ref={colRef}
       key={column.id}
-      className={`w-[22rem] bg-gray-300 rounded-md max-h-fit column drag-zone px-4`}
-      id={`col${column.id}`}
+      className={`w-[22rem] bg-white rounded-md max-h-fit column drag-zone px-4`}
+      id={column.id}
       column-id={column.id}
-      onDrop={()=>alert(column.id)}
-      onDragOver={(e)=>e.preventDefault()}
+      onDrop={() => alert(column.id)}
+      onDragOver={(e) => e.preventDefault()}
     >
-      <div className="h-fit py-3 px-3 mx-5 overflow-hidden flex flex-row justify-between border-b-2 border-gray-500 group gap-2 min-w-60 ">
-        {changeTitle ? (
-          <input
-            type="text"
-            defaultValue={column.title}
-            ref={titleInput}
-            onBlur={() => {
-              changeColName(
-                column.id,
-                titleInput.current?.value ?? column.title
-              );
-              setChangeTitle(false);
-            }}
-          />
-        ) : (
-          <h2 className="w-fit mx-auto popop ">{column.title}</h2>
-        )}
+      <div className="h-fit py-3 px-3 mx-5 overflow-hidden flex flex-row justify-between border-b-2 border-gray-300 group gap-2 min-w-60 ">
+        <div className=" m-auto">
+          {changeTitle ? (
+            <input
+              type="text"
+              className="m-auto w-full"
+              defaultValue={column.title}
+              ref={titleInput}
+              onBlur={() => {
+                changeColName(
+                  column.id,
+                  titleInput.current?.value ?? column.title
+                );
+                setChangeTitle(false);
+              }}
+            />
+          ) : (
+            <h2 className="w-fit mx-auto popop text-foreground ">
+              {column.title}
+            </h2>
+          )}
+        </div>
         <DropdownMenu key={column.id === Od.value ? Od.value : undefined}>
           <DropdownMenuTrigger asChild>
             <Button
@@ -127,7 +125,7 @@ export const Column = ({ column }: ColProp) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className=" task bg-transparent  rounded-b-md py-3" >
+      <div className={`task-${column.id} bg-transparent rounded-b-md py-3`}>
         {column.tasks.map((task) => (
           <Task task={task} col={column} key={task.id} />
         ))}
