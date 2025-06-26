@@ -7,4 +7,6 @@ export type ColumnType = {
 export type TasksType = {
     id: string,
     name: string,
+    status?: string,
+    deadLine?:string| Date 
 }

@@ -10,23 +10,36 @@ import {
 import { useBoardStore } from "@/store/boardStore";
 import { Textarea } from "../ui/textarea";
 import { Flip } from "gsap/Flip";
+import { Calendar } from "../ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 export const AddTaskDialog = () => {
   const openDialog = useBoardStore((state) => state.setOpenDialog);
   const Od = useBoardStore((state) => state.openDialog);
   const addTask = useBoardStore((state) => state.addTask);
   const editTask = useBoardStore((state) => state.editTask);
+  const [open, setOpen] = useState<boolean>(false);
+  const [deadLine, setDeadLine] = useState<Date | undefined>();
 
   const [input, setInput] = useState<string>("");
 
-  useEffect(() => setInput(Od.EditedContent || ""), [Od.EditedContent]);
+  useEffect(() => {
+    setInput(Od.task?.name || "")
+    setDeadLine(Od.task?.deadLine ? new Date(Od.task.deadLine) : undefined)
+  }, [Od.task?.name, Od.task?.deadLine]);
 
   function handleAddTask() {
     const state = Flip.getState(`.task-${Od.value}`);
 
-    if (Od.taskId && Od.EditedContent) editTask(Od.value, Od.taskId, input);
+    if (Od.task?.id && Od.task.name)
+      editTask(
+        Od.value,
+        Od.task.id,
+        input,
+        deadLine && new Date(deadLine?.toISOString())
+      );
     else {
-      addTask(Od.value, input);
+      addTask(Od.value, input, deadLine && new Date(deadLine?.toISOString()));
 
       requestAnimationFrame(() =>
         Flip.from(state, {
@@ -40,36 +53,53 @@ export const AddTaskDialog = () => {
     setInput("");
     openDialog({ value: "" });
   }
+  useEffect(() => {
+    console.log(deadLine);
+  }, [deadLine]);
 
   return (
     <Dialog
       open={Od.value.trim() !== ""}
-      onOpenChange={(open) => !open && openDialog({ value: "" })}
+      onOpenChange={(openD) => !openD && !open && openDialog({ value: "" })}
     >
-      <div>
-        <div>
-          <DialogContent key={Od.value}>
-            <DialogHeader>
-              <DialogTitle>Add New Task</DialogTitle>
-              <DialogDescription>describe your new task</DialogDescription>
-            </DialogHeader>
-            <div className="px-4 py-5 ">
-              <Textarea
-                placeholder="Task..."
-                onChange={(e) => setInput(e.target.value)}
-                value={input}
-              />
-              <Button
-                variant="outline"
-                className="my-4"
-                onClick={handleAddTask}
+      <Popover open={open} onOpenChange={setOpen}>
+        <DialogContent key={Od.value}>
+          <DialogHeader>
+            <DialogTitle>Add New Task</DialogTitle>
+            <DialogDescription>describe your new task</DialogDescription>
+          </DialogHeader>
+          <div className="px-4 py-5 ">
+            <Textarea
+              placeholder="Task..."
+              onChange={(e) => setInput(e.target.value)}
+              value={input}
+            />
+            <div className="my-4">
+              <PopoverTrigger asChild>
+                <Button>set DeadLine</Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-auto overflow-hidden p-0 z-50"
+                align="start"
               >
-                Add
-              </Button>
+                <Calendar
+                  className=" z-50"
+                  mode="single"
+                  captionLayout="dropdown"
+                  selected={deadLine}
+                  onSelect={(date) => {
+                    setOpen(false);
+                    setDeadLine(date);
+                  }}
+                />
+              </PopoverContent>
             </div>
-          </DialogContent>
-        </div>
-      </div>
+            <Button variant="outline" className="my-4" onClick={handleAddTask}>
+              Add
+            </Button>
+          </div>
+        </DialogContent>
+      </Popover>
     </Dialog>
   );
 };

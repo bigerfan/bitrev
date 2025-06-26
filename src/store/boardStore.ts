@@ -1,4 +1,4 @@
-import type { ColumnType } from '@/lib/types';
+import type { ColumnType, TasksType } from '@/lib/types';
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { nanoid } from 'nanoid'
@@ -6,12 +6,12 @@ import { nanoid } from 'nanoid'
 type BoardState = {
     columns: ColumnType[],
     deletePendingCols: string[],
-    openDialog: { value: string, taskId?: string, EditedContent?: string },
+    openDialog: { value: string, task ?: TasksType},
     setdeletePendingCol: (colId: string) => void,
     undoDeletePendingCol: (colId: string) => void,
-    setOpenDialog: (newOd: { value: string, taskId?: string, EditedContent?: string }) => void,
-    addTask: (columnId: string, taskName: string) => void,
-    editTask: (columnId: string, taskId: string, editContent: string) => void,
+    setOpenDialog: (newOd: { value: string,task? : TasksType}) => void,
+    addTask: (columnId: string, taskName: string ,date? : Date) => void,
+    editTask: (columnId: string, taskId: string, editContent: string , date?: Date) => void,
     deleteTask: (columnId: string, taskId: string) => void,
     moveTask: (toColumn: string, taskId: string) => void,
     addColumn: (columnName: string, added?: boolean) => void,
@@ -39,14 +39,14 @@ export const useBoardStore = create<BoardState>()(
         })),
         columns: [],
 
-        addTask: (columnId, taskname) =>
+        addTask: (columnId, taskname, date?) =>
             set(state => ({
                 columns:
-                    state.columns.map((col) => col.id == columnId ? { ...col, tasks: [...col.tasks, { name: taskname, id: `task-${nanoid(6)}` }] } : col)
+                    state.columns.map((col) => col.id == columnId ? { ...col, tasks: [...col.tasks, { name: taskname, id: `task-${nanoid(6)}`, deadLine: date }] } : col)
             })),
-        editTask: (columnId, taskId, editContent) =>
+        editTask: (columnId, taskId, editContent, date?) =>
             set(state => ({
-                columns: state.columns.map(col => col.id == columnId ? { ...col, tasks: col.tasks.map(task => task.id == taskId ? { ...task, name: editContent } : task) } : col)
+                columns: state.columns.map(col => col.id == columnId ? { ...col, tasks: col.tasks.map(task => task.id == taskId ? { ...task, name: editContent , deadLine: date } : task) } : col)
             })),
         deleteTask: (columnId, taskId) =>
             set(state => ({

@@ -1,5 +1,3 @@
-
-
 body {
   background-color: #ebebeb;
   overflow-x: auto;
@@ -34,4 +32,21 @@ h2 {
 
 .custom-scrollbar:hover::-webkit-scrollbar-thumb {
   background-color: rgba(100, 100, 100, 0.6);
+}
+
+@keyframes warning {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 99, 71, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(255, 99, 71, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 99, 71, 0);
+  }
+}
+
+.warningCard {
+  animation: warning 1.7s ease-in-out infinite alternate;
+  border-radius: 0.5rem;
 }

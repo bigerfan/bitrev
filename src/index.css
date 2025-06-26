@@ -130,4 +130,6 @@
   .highlight-zone {
     @apply ring-2 ring-primary transition-all bg-[#FACC15!important];
   }
+
+
 }

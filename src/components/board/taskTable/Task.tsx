@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FaRegEdit } from "react-icons/fa";
@@ -15,6 +17,7 @@ import { useGSAP } from "@gsap/react";
 import { stateOut } from "@/lib/animation";
 import { Draggable } from "gsap/Draggable";
 import { Flip } from "gsap/Flip";
+import { isOneDayBefore } from "@/lib/functions";
 
 type TaskProp = {
   task: TasksType;
@@ -22,12 +25,17 @@ type TaskProp = {
 };
 
 export const Task = ({ task, col }: TaskProp) => {
-
-
   const taskref = useRef(null);
   const deleteTask = useBoardStore((state) => state.deleteTask);
   const openDialog = useBoardStore((state) => state.setOpenDialog);
   const moveTask = useBoardStore((state) => state.moveTask);
+
+  const deadLine = task.deadLine ? new Date(task.deadLine) : undefined;
+
+  let warning = false;
+
+  if(deadLine && isOneDayBefore(deadLine))
+    warning = true
 
   useGSAP(() => {
     if (taskref.current)
@@ -44,7 +52,7 @@ export const Task = ({ task, col }: TaskProp) => {
           scale: 1.1,
           boxShadow: "0px 10px 25px rgba(0,0,0,0.2)",
           zIndex: 9999,
-          opacity:1,
+          opacity: 1,
           duration: 0.2,
         });
       },
@@ -72,7 +80,10 @@ export const Task = ({ task, col }: TaskProp) => {
         this.lastY = this.y;
       },
       onDragEnd: () => {
-        setTimeout(() => gsap.to(".task", { opacity: 1, stagger: 0.1,zIndex: 1 }), 300);
+        setTimeout(
+          () => gsap.to(".task", { opacity: 1, stagger: 0.1, zIndex: 1 }),
+          300
+        );
       },
       onRelease: function () {
         const zones = document.querySelectorAll(".drag-zone");
@@ -128,10 +139,10 @@ export const Task = ({ task, col }: TaskProp) => {
       key={task.id}
       id={task.id}
       ref={taskref}
-      className={`w-auto task-${col.id} task draggable-Task my-4 overflow-hidden bg-muted`}
+      className={`w-auto task-${col.id} task draggable-Task my-4 overflow-hidden bg-muted ${warning && 'warningCard'}`}
       parent-col={col.id}
     >
-      <CardContent className="break-words whitespace-normal ">
+      <CardContent className="break-words whitespace-pre-line ">
         {task.name}
       </CardContent>
       <CardFooter className="">
@@ -142,8 +153,7 @@ export const Task = ({ task, col }: TaskProp) => {
             onClick={() =>
               openDialog({
                 value: col.id,
-                taskId: task.id,
-                EditedContent: task.name,
+                task: task,
               })
             }
           >
@@ -161,13 +171,10 @@ export const Task = ({ task, col }: TaskProp) => {
           >
             <MdDeleteOutline />
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button>
-                <GrStatusInfo />
-              </Button>
-            </DropdownMenuTrigger>
-          </DropdownMenu>
+
+          <Button className=" z-50">
+            <GrStatusInfo />
+          </Button>
         </div>
       </CardFooter>
     </Card>
