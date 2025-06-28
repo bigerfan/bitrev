@@ -17,7 +17,7 @@ export const Table = () => {
 
 
   return (
-    <div className="flex gap-3 ">
+    <div className="flex gap-3  ">
       {columns.map((column) => (
         <Column column={column} />
       ))}

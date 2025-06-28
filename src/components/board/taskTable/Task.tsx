@@ -1,18 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
-import { GrStatusInfo } from "react-icons/gr";
-import type { ColumnType, TasksType } from "@/lib/types";
+import type {  TasksType } from "@/lib/types";
 import { useBoardStore } from "@/store/boardStore";
 import gsap from "gsap";
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { stateOut } from "@/lib/animation";
 import { Draggable } from "gsap/Draggable";
@@ -21,10 +14,10 @@ import { isOneDayBefore } from "@/lib/functions";
 
 type TaskProp = {
   task: TasksType;
-  col: ColumnType;
+  columnId: string;
 };
 
-export const Task = ({ task, col }: TaskProp) => {
+export const Task = memo(({ task, columnId }: TaskProp) => {
   const taskref = useRef(null);
   const deleteTask = useBoardStore((state) => state.deleteTask);
   const openDialog = useBoardStore((state) => state.setOpenDialog);
@@ -34,15 +27,13 @@ export const Task = ({ task, col }: TaskProp) => {
 
   let warning = false;
 
-  if(deadLine && isOneDayBefore(deadLine))
-    warning = true
+  if (deadLine && isOneDayBefore(deadLine)) warning = true;
 
   useGSAP(() => {
-    if (taskref.current)
+    if (taskref.current )
       gsap.fromTo(taskref.current, { opacity: 0 }, { opacity: 1, delay: 0.4 });
 
     const draggable = Draggable.create(taskref.current, {
-      edgeResistance: 0.8,
       onDragStart: function () {
         this.target.classList.remove("task");
         gsap.to(".task", {
@@ -60,6 +51,7 @@ export const Task = ({ task, col }: TaskProp) => {
         const zones = document.querySelectorAll(".drag-zone");
 
         zones.forEach((zone) => {
+          // finding dropzones and animatethem when draggingcard get on them
           const rect = zone.getBoundingClientRect();
           const isOver =
             this.pointerX > rect.left &&
@@ -74,6 +66,7 @@ export const Task = ({ task, col }: TaskProp) => {
           }
         });
       },
+      autoScroll: 1,
       zIndexBoost: true,
       onPress: function (e) {
         this.lastX = this.x;
@@ -103,9 +96,9 @@ export const Task = ({ task, col }: TaskProp) => {
 
           if (isIn) zone.classList.remove("highlight-zone");
 
-          if (isIn && targetId && targetId !== col.id) {
+          if (isIn && targetId && targetId !== columnId) {
             zone.classList.remove("highlight-zone");
-            const state = Flip.getState(`.task-${col.id}, .task-${targetId} `);
+            const state = Flip.getState(`.task-${columnId}, .task-${targetId} `);
 
             moveTask(targetId, task.id);
             requestAnimationFrame(() => {
@@ -115,7 +108,7 @@ export const Task = ({ task, col }: TaskProp) => {
               });
             });
             break;
-          } else if (!isIn) {
+          } else {
             gsap.to(this.target, {
               x: this.startX,
               y: this.startY,
@@ -136,23 +129,26 @@ export const Task = ({ task, col }: TaskProp) => {
 
   return (
     <Card
-      key={task.id}
       id={task.id}
       ref={taskref}
-      className={`w-auto task-${col.id} task draggable-Task my-4 overflow-hidden bg-muted ${warning && 'warningCard'}`}
-      parent-col={col.id}
+      className={`w-auto task-${
+        columnId
+      } task draggable-Task my-4 overflow-hidden bg-muted ${
+        warning && "warningCard"
+      }`}
+      parent-col={columnId}
     >
       <CardContent className="break-words whitespace-pre-line ">
         {task.name}
       </CardContent>
-      <CardFooter className="">
-        <div className="flex gap-2">
+      <CardFooter className="flex justify-between">
+        <div className="flex gap-2 ">
           <Button
-            variant={"secondary"}
+            variant={"default"}
             className=""
             onClick={() =>
               openDialog({
-                value: col.id,
+                value: columnId,
                 task: task,
               })
             }
@@ -163,20 +159,19 @@ export const Task = ({ task, col }: TaskProp) => {
             variant={"destructive"}
             onClick={() => {
               if (taskref.current)
-                stateOut(`.task-${col.id}`, taskref.current, () =>
-                  deleteTask(col.id, task.id)
+                stateOut(`.task-${columnId}`, taskref.current, () =>
+                  deleteTask(columnId, task.id)
                 );
             }}
             className=""
           >
             <MdDeleteOutline />
           </Button>
-
-          <Button className=" z-50">
-            <GrStatusInfo />
-          </Button>
+        </div>
+        <div>
+          <span>{task.deadLine && new Date(task.deadLine).toDateString()}</span>
         </div>
       </CardFooter>
     </Card>
   );
-};
+})

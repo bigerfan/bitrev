@@ -10,7 +10,7 @@ import { IoIosMore } from "react-icons/io";
 import { Task } from "./Task";
 import type { ColumnType } from "@/lib/types";
 import { toast } from "sonner";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { stateIn, stateOut } from "@/lib/animation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -19,11 +19,10 @@ type ColProp = {
   column: ColumnType;
 };
 
-export const Column = ({ column }: ColProp) => {
+export const Column = memo(({ column }: ColProp) => {
   const {
     undoDeletePendingCol,
     setdeletePendingCol,
-    columns,
     deleteColumn: deleteCol,
     setOpenDialog: openDialog,
     openDialog: Od,
@@ -57,7 +56,6 @@ export const Column = ({ column }: ColProp) => {
             .getState()
             .deletePendingCols.includes(column.id);
           if (isStillPending) deleteCol(column.id);
-          console.log(columns);
         },
       });
     }
@@ -71,7 +69,7 @@ export const Column = ({ column }: ColProp) => {
     <div
       ref={colRef}
       key={column.id}
-      className={`w-[22rem] bg-white rounded-md max-h-fit column drag-zone px-4`}
+      className={`w-[25rem] bg-white rounded-md max-h-fit column drag-zone px-4 border-[1px] border-gray-200`}
       id={column.id}
       column-id={column.id}
       onDrop={() => alert(column.id)}
@@ -127,9 +125,9 @@ export const Column = ({ column }: ColProp) => {
       </div>
       <div className={`task-${column.id} bg-transparent rounded-b-md py-3`}>
         {column.tasks.map((task) => (
-          <Task task={task} col={column} key={task.id} />
+          <Task task={task} columnId={column.id} key={task.id} />
         ))}
       </div>
     </div>
   );
-};
+})

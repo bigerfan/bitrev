@@ -6,7 +6,7 @@ type Props = {
 
 export const Appcontainer = ({ children }: Props) => {
   return (
-    <div className="min-h-screen flex justify-center items-start text-foreground text-base my-4 px-8">
+    <div className="min-h-screen flex justify-center items-start text-foreground text-base my-4">
       {children}
     </div>
   );

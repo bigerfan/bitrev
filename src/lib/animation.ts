@@ -56,7 +56,6 @@ export function stateOut(state: string, selector: HTMLElement | string , onCompl
             }
         })
 
-    console.log(selector)
 }
 
 export function stateIn(state: string, selector?: HTMLElement | string | null, onComplete?: () => void) {

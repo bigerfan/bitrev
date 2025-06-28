@@ -10,8 +10,8 @@ type BoardState = {
     setdeletePendingCol: (colId: string) => void,
     undoDeletePendingCol: (colId: string) => void,
     setOpenDialog: (newOd: { value: string,task? : TasksType}) => void,
-    addTask: (columnId: string, taskName: string ,date? : Date) => void,
-    editTask: (columnId: string, taskId: string, editContent: string , date?: Date) => void,
+    addTask: (columnId: string, taskName: string ,status:string,date? : Date) => void,
+    editTask: (columnId: string, taskId: string, editContent: string ,status: string, date?: Date ) => void,
     deleteTask: (columnId: string, taskId: string) => void,
     moveTask: (toColumn: string, taskId: string) => void,
     addColumn: (columnName: string, added?: boolean) => void,
@@ -24,12 +24,11 @@ type BoardState = {
 
 
 export const useBoardStore = create<BoardState>()(
-    persist((set, get) => ({
+    persist((set,get) => ({
         openDialog: { value: '' },
-        setOpenDialog: (newOd) => set(state => ({
+        setOpenDialog: (newOd) => set({
             openDialog: { ...newOd }
         }),
-        ),
         deletePendingCols: [],
         setdeletePendingCol: (colId) => set(state => ({
             deletePendingCols: [...state.deletePendingCols, colId]
@@ -39,14 +38,17 @@ export const useBoardStore = create<BoardState>()(
         })),
         columns: [],
 
-        addTask: (columnId, taskname, date?) =>
+        addTask: (columnId, taskname ,status, date?) =>
+            {
+                set(state => {
+                return {columns:
+                    state.columns.map((col) => col.id == columnId ? { ...col, tasks: [...col.tasks, { name: taskname, id: `task-${nanoid(6)}`, deadLine: date,status: status }] } : col)}
+            })
+
+        },
+        editTask: (columnId, taskId, editContent ,status, date?) =>
             set(state => ({
-                columns:
-                    state.columns.map((col) => col.id == columnId ? { ...col, tasks: [...col.tasks, { name: taskname, id: `task-${nanoid(6)}`, deadLine: date }] } : col)
-            })),
-        editTask: (columnId, taskId, editContent, date?) =>
-            set(state => ({
-                columns: state.columns.map(col => col.id == columnId ? { ...col, tasks: col.tasks.map(task => task.id == taskId ? { ...task, name: editContent , deadLine: date } : task) } : col)
+                columns: state.columns.map(col => col.id == columnId ? { ...col, tasks: col.tasks.map(task => task.id == taskId ? { ...task, name: editContent , deadLine: date,status: status } : task) } : col)
             })),
         deleteTask: (columnId, taskId) =>
             set(state => ({
@@ -79,9 +81,9 @@ export const useBoardStore = create<BoardState>()(
             }))
 
         },
-        deleteColumn: (columnId) => set(state => ({
-            columns: state.columns.filter(col => col.id !== columnId)
-        })),
+        deleteColumn: (columnId) => set({
+            columns: get().columns.filter(col => col.id !== columnId)
+        }),
         createCol: (column, index) => set((state) => {
             const newCols = [...state.columns]
             newCols.splice(index, 0, column)
