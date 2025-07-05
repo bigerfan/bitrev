@@ -128,7 +128,7 @@
   }
 
   .highlight-zone {
-    @apply ring-2 ring-primary transition-all bg-[#FACC15!important];
+    @apply ring-2 ring-primary transition-all bg-[#E6B31E!important];
   }
 
 

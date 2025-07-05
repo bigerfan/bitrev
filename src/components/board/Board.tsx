@@ -4,7 +4,7 @@ import { AddColumn } from "./AddColumn";
 
 export const Board = () => {
   return (
-    <div className="flex overflow-x-auto min-w-full min-h-screen px-5 colTable  ">
+    <div className="flex overflow-x-auto min-w-full min-h-screen px-5 py-3 colTable custom-scrollbar ">
         <Table />
         <TaskDialog />
         <AddColumn />

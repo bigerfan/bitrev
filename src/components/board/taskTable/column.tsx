@@ -32,33 +32,34 @@ export const Column = memo(({ column }: ColProp) => {
   const [changeTitle, setChangeTitle] = useState<boolean>(false);
   const titleInput = useRef<HTMLInputElement>(null);
   const colRef = useRef<HTMLDivElement>(null);
+  const columnId = column.id
 
   useGSAP(() => {
     if (colRef.current)
       gsap.fromTo(colRef.current, { opacity: 0 }, { opacity: 1, delay: 0.4 });
-  });
+  }, []);
 
   function handleDeleteCol() {
     if (colRef.current) {
       setdeletePendingCol(column.id);
-      stateOut(".column", colRef.current);
-
-      toast.success("Column has Been deleted", {
-        action: {
-          label: "Undo",
-          onClick: () => {
-            undoDeletePendingCol(column.id);
-            stateIn(".column", colRef.current);
+      stateOut(".column", colRef.current, () => {
+        toast.success("Column has Been deleted", {
+          action: {
+            label: "Undo",
+            onClick: () => {
+              undoDeletePendingCol(column.id);
+              stateIn(".column", colRef.current);
+            },
           },
-        },
-        onAutoClose: () => {
-          const isStillPending = useBoardStore
-            .getState()
-            .deletePendingCols.includes(column.id);
-          if (isStillPending) deleteCol(column.id);
-        },
+          onAutoClose: () => {
+            const isStillPending = useBoardStore
+              .getState()
+              .deletePendingCols.includes(column.id);
+            if (isStillPending) deleteCol(column.id);
+          },
+        });
       });
-    }
+    } else return;
   }
 
   useEffect(() => {
@@ -125,9 +126,9 @@ export const Column = memo(({ column }: ColProp) => {
       </div>
       <div className={`task-${column.id} bg-transparent rounded-b-md py-3`}>
         {column.tasks.map((task) => (
-          <Task task={task} columnId={column.id} key={task.id} />
+          <Task task={task} columnId={columnId} key={task.id} />
         ))}
       </div>
     </div>
   );
-})
+});

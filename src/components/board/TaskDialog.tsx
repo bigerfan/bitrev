@@ -27,15 +27,15 @@ export const TaskDialog = () => {
   const editTask = useBoardStore((state) => state.editTask);
   const [open, setOpen] = useState<boolean>(false);
   const [deadLine, setDeadLine] = useState<Date | undefined>();
-  const [status, setStatus] = useState<string>("To Do");
+  const [status, setStatus] = useState<string>("ToDo");
 
   const [input, setInput] = useState<string>("");
 
   useEffect(() => {
     setInput(Od.task?.name || "");
     setDeadLine(Od.task?.deadLine ? new Date(Od.task.deadLine) : undefined);
-    setStatus(Od.task?.status ? Od.task.status : "To Do");
-  }, [Od.task?.name, Od.task?.deadLine]);
+    setStatus(Od.task?.status ? Od.task.status : "ToDo");
+  }, [Od]);
 
   function handleAddTask() {
     const state = Flip.getState(`.task-${Od.value}`);
@@ -117,7 +117,7 @@ export const TaskDialog = () => {
                   value={status}
                   onValueChange={setStatus}
                 >
-                  <DropdownMenuRadioItem value="To Do">
+                  <DropdownMenuRadioItem value="ToDo">
                     To Do
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="InProgress">

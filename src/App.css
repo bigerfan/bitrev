@@ -19,6 +19,7 @@ h2 {
 
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
+  height: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -49,4 +50,37 @@ h2 {
 .warningCard {
   animation: warning 1.7s ease-in-out infinite alternate;
   border-radius: 0.5rem;
+}
+
+.active {
+  outline-width: 1px;
+  outline-offset: 0;
+  outline-color: #F57D1F;
+  outline-style: solid;
+  animation: animateOutline 1.3s ease infinite;
+}
+
+@keyframes animateOutline {
+  0% {
+    outline-width: 1px;
+    outline-offset: 0;
+    outline-color: rgba(245, 125, 31, 0); /* rgba for #F57D1F */
+  }
+
+  10% {
+    outline-color: rgba(245, 125, 31, 0.75); /* rgba for #F57D1F */
+  }
+
+  /* The animation finishes at 50% */
+  50% {
+    outline-width: 7px;
+    outline-offset: 4px;
+    outline-color: rgba(245, 125, 31, 0); /* rgba for #F57D1F */
+  }
+
+  100% {
+    outline-width: 7px;
+    outline-offset: 4px;
+    outline-color: rgba(245, 125, 31, 0); /* rgba for #F57D1F */
+  }
 }

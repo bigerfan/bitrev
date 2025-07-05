@@ -74,10 +74,8 @@ export const useBoardStore = create<BoardState>()(
             })
         ,
         addColumn: (columnName, added) => {
-            const colId = `col-${nanoid(6)}`
-
             set(state => ({
-                columns: [...state.columns, { id: colId, title: columnName, tasks: [], added: added }]
+                columns: [...state.columns, { id: `col-${nanoid(6)}`, title: columnName, tasks: [], added: added }]
             }))
 
         },
@@ -94,7 +92,7 @@ export const useBoardStore = create<BoardState>()(
         changeColumnName: (columnId, newTitle) => set(state => ({
             columns: state.columns.map(col => col.id == columnId ? { ...col, title: newTitle } : col)
         })),
-    }), { name: 'board=store', partialize: (state) => ({ columns: state.columns }), })
+    }), { name: 'board-store', partialize: (state) => ({ columns: state.columns }), })
 
 
 

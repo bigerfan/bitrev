@@ -19,7 +19,7 @@ export const Table = () => {
   return (
     <div className="flex gap-3  ">
       {columns.map((column) => (
-        <Column column={column} />
+        <Column column={column} key={column.id} />
       ))}
     </div>
   );
