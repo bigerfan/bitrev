@@ -1,34 +1,52 @@
 # React + TypeScript + Vite
 
 
+# Bitrev – Trello-like Task Board
 
-# Simple Trello-like Task Board
-
-A minimal, polished Trello-style task management app built with React, TypeScript, Zustand, and TailwindCSS. The focus is on clean UI, smooth UX, and state management without a backend.
-
-## Features
-
--  Add, edit, and delete tasks
--  Create multiple columns (e.g., To Do, In Progress, Done)
--  Drag-and-drop friendly layout 
-
+A simple and polished Trello-style task board built with **React**, **TypeScript**, **Zustand**, and **TailwindCSS**.  
+Designed for clean UI, smooth animations, and fast interactions — all without a backend.
 
 ---
 
-## Tech Stack
+## ✨ Features
+
+-  Add, edit, and delete tasks
+-  Create and rename columns
+-  Drag-and-drop between columns
+-  Set deadlines and task statuses
+-  Smooth animations (GSAP)
+
+---
+
+## 🧰 Tech Stack
 
 - **React + TypeScript** – UI & logic
-- **Zustand** – Lightweight state management
-- **TailwindCSS** – Styling
-- **GSAP** – Animations
-- **Shadcn/ui** 
+- **Zustand** – Lightweight global state
+- **TailwindCSS** – Utility-first styling
+- **GSAP** – For animations and transitions
+- **shadcn/ui** – Prebuilt UI components
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Clone the Repository
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/your-username/bitrev.git
+cd bitrev
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Run the app
+
+```bash
+npm run dev
+The app will be available at http://localhost:5173.
+```
+
